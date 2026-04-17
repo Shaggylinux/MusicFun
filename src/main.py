@@ -1,6 +1,7 @@
 import flet   as ft
 import yt_dlp as yt
 import threading
+import ffmpeg
 
 def main(page : ft.Page):
     def videoinfo(url):
@@ -24,7 +25,7 @@ def main(page : ft.Page):
             else:
                 ruta = "Downloads/"
             ydl_opts = {
-                        'format': 'bestaudio/best',
+                        'format': 'bestaudio[ext=m4a]',
                         'outtmpl': f'{ruta}%(title)s.%(ext)s',
                         'fixup': 'never',
                         'nopart': True,
