@@ -1,5 +1,5 @@
 [project]
-name = "YoutubeDownloader"
+name = "MusicFun"
 version = "0.1.0"
 description = ""
 readme = "README.md"
@@ -22,7 +22,7 @@ dev = [
 [tool.flet]
 desktop_flavor = "light"    # Change to "full" to use flet-audio and flet-video
 org = "com.mycompany"
-product = "YoutubeDownloader"
+product = "MusicFun"
 company = "Flet"
 copyright = "Copyright (C) 2023-2026 by Flet"
 
