@@ -20,6 +20,7 @@ def main(page : ft.Page):
         if page.platform == ft.PagePlatform.ANDROID:
             ydl_opts = {
                         'format': 'bestaudio/best',
+
                         'outtmpl': '/storage/emulated/0/Download/%(title)s.%(ext)s',
                         'fixup': 'never',
                         'nopart': True,
