@@ -1,9 +1,12 @@
 import flet      as ft
 import yt_dlp    as yt
 import threading as th
+import Alert     as Al
+import Config    as co
 
 def main(page : ft.Page):
     ruta = ""
+
     async def choosepath():
         nonlocal ruta
         selector       = ft.FilePicker()
@@ -31,9 +34,9 @@ def main(page : ft.Page):
             nonlocal ruta
             if ruta == "":
                 if page.platform == ft.PagePlatform.ANDROID:
-                    ruta = "/storage/emulated/0/Download/"
+                    ruta = "/storage/emulated/0/Download"
                 else:
-                    ruta = "Downloads/"
+                    ruta = "Downloads"
             ydl_opts = {
                         'format': 'bestaudio[ext=m4a]',
                         'outtmpl': f'{ruta}/%(title)s.%(ext)s',
@@ -65,6 +68,9 @@ def main(page : ft.Page):
     DownloadButton = ft.Button("Search", on_click = search)
     ButtonChoose   = ft.Button("Choose directory", on_click = choosepath)
     PathText       = ft.Text("Path : ")
+
+    if co.leer("Aceptar") == 0:
+        page.show_dialog(Al.Alerta.update(page, True))
 
     page.controls.append(Image)
     page.controls.append(entry)
