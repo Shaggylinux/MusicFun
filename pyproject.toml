@@ -9,7 +9,8 @@ authors = [
 ]
 dependencies = [
     "flet>=0.84.0",
-    "yt-dlp"
+    "yt-dlp",
+    "flet-permission-handler"
 ]
 
 [dependency-groups]
