@@ -1,9 +1,12 @@
 {
-    "Version": "0.0.2",
+    "Version": "0.0.3",
     "Changelog": [
         "Ventanas emergentes.",
         "Cambiar ruta de descarga.",
-        "Notiticaciones de descarga."
+        "Notiticaciones de descarga.",
+        "Elegir ruta",
+        "Guardar ruta"
     ],
-    "Aceptar": 1
+    "Aceptar": 0,
+    "Path": ""
 }
