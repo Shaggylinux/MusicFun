@@ -5,15 +5,25 @@ import Alert     as Al
 import Config    as co
 
 def main(page : ft.Page):
-    ruta = ""
+    ruta = co.leer("Path")
 
+    if not ruta:
+        if page.platform == ft.PagePlatform.ANDROID:
+            ruta = "/storage/emulated/0/Download"
+        else:
+            ruta = '$HOME/MusicFun'
+        co.editar("Path", ruta)
+    
     async def choosepath():
         nonlocal ruta
-        selector       = ft.FilePicker()
-        save           = await selector.get_directory_path()
-        ruta           = save
-        PathText.value = f"Path : {ruta}"
-        PathText.update()
+        selector = ft.FilePicker()
+        save = await selector.get_directory_path()
+        if save:
+            co.editar("Path", save)
+            ruta           = save
+            PathText.value = f"Path : {ruta}"
+            PathText.update()
+            page.update()
 
     def videoinfo(url):
         ydl_opts = {
@@ -28,26 +38,41 @@ def main(page : ft.Page):
             duracion  = info.get('duration', 0)
             return title, miniatura, duracion
 
-    def viewdownload():
-        url = entry.value
-        def rundownload():
-            nonlocal ruta
-            if ruta == "":
-                if page.platform == ft.PagePlatform.ANDROID:
-                    ruta = "/storage/emulated/0/Download"
-                else:
-                    ruta = "Downloads"
-            ydl_opts = {
-                        'format': 'bestaudio[ext=m4a]',
-                        'outtmpl': f'{ruta}/%(title)s.%(ext)s',
-                        'fixup': 'never',
-                        'nopart': True,
-                        'prefer_ffmpeg': False,
-                        'external_downloader': None
-                    }
-            with yt.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([url])
-        th.Thread(target = rundownload, daemon = True).start()
+    def viewdownload(e):
+            url = entry.value
+            
+            # 1. Creamos la alerta
+            alerta_descarga = Al.Alerta.alerta(page, True, "Completado", "La descarga se ha completado.")
+            
+            # 2. La asignamos
+            page.dialog = alerta_descarga
+            
+            # 3. ¡ESTA ES LA CLAVE! 
+            # Registramos la alerta en la página ANTES de lanzar el hilo.
+            # Esto le da un "ID" al control y evita el RuntimeError.
+            page.update() 
+
+            def rundownload():
+                ydl_opts = {
+                    'format'              : 'bestaudio[ext=m4a]',
+                    'outtmpl'             : f'{ruta}/%(title)s.%(ext)s',
+                    'fixup'               : 'never',
+                    'nopart'              : True,
+                    'prefer_ffmpeg'       : False,
+                    'external_downloader' : None
+                }
+                try:
+                    with yt.YoutubeDL(ydl_opts) as ydl:
+                        ydl.download([url])
+                        
+                        # Ahora que la alerta ya tiene un "ID" (gracias al page.update de arriba)
+                        # ya podemos usar el .update() directo del control.
+                        alerta_descarga.open = True
+                        alerta_descarga.update() 
+                except Exception as ex:
+                    print(f"Error en descarga: {ex}")
+                
+            th.Thread(target = rundownload, daemon = True).start()
 
     def search():
         if (entry.value == ""):
@@ -67,7 +92,7 @@ def main(page : ft.Page):
     DurationText   = ft.Text("Duration : --:--")
     DownloadButton = ft.Button("Search", on_click = search)
     ButtonChoose   = ft.Button("Choose directory", on_click = choosepath)
-    PathText       = ft.Text("Path : ")
+    PathText       = ft.Text(f"Path : {co.leer("Path")}")
 
     if co.leer("Aceptar") == 0:
         page.show_dialog(Al.Alerta.update(page, True))
