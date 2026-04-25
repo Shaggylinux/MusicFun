@@ -1,11 +1,22 @@
 import flet      as ft
 import yt_dlp    as yt
-import threading as th
 import Alert     as Al
 import Config    as co
+import os
 
 def main(page : ft.Page):
     ruta = co.leer("Path")
+    
+    def clean():
+        Image.src               = "NoImage.png"
+        DownloadButton.content  = "Search"
+        DownloadText.value      = "Title : None"
+        DurationText.value      = "Duration : --:--"
+        DownloadButton.disabled = False
+        DownloadButton.icon     = ft.Icons.SEARCH_OUTLINED
+        entry.value             = ""
+        DownloadButton.on_click = search
+        page.update()
 
     if not ruta:
         if page.platform == ft.PagePlatform.ANDROID:
@@ -39,40 +50,36 @@ def main(page : ft.Page):
             return title, miniatura, duracion
 
     def viewdownload(e):
-            url = entry.value
-            
-            # 1. Creamos la alerta
-            alerta_descarga = Al.Alerta.alerta(page, True, "Completado", "La descarga se ha completado.")
-            
-            # 2. La asignamos
-            page.dialog = alerta_descarga
-            
-            # 3. ¡ESTA ES LA CLAVE! 
-            # Registramos la alerta en la página ANTES de lanzar el hilo.
-            # Esto le da un "ID" al control y evita el RuntimeError.
-            page.update() 
+        url = entry.value
+        nombre = videoinfo(entry.value)
+        ruta_completa = "".join(ruta) + "/" + nombre[0] + ".m4a"
+        
+        DownloadButton.content = "Downloading..."
+        DownloadButton.disabled = True
+        page.update()
 
-            def rundownload():
-                ydl_opts = {
-                    'format'              : 'bestaudio[ext=m4a]',
-                    'outtmpl'             : f'{ruta}/%(title)s.%(ext)s',
-                    'fixup'               : 'never',
-                    'nopart'              : True,
-                    'prefer_ffmpeg'       : False,
-                    'external_downloader' : None
-                }
-                try:
-                    with yt.YoutubeDL(ydl_opts) as ydl:
-                        ydl.download([url])
-                        
-                        # Ahora que la alerta ya tiene un "ID" (gracias al page.update de arriba)
-                        # ya podemos usar el .update() directo del control.
-                        alerta_descarga.open = True
-                        alerta_descarga.update() 
-                except Exception as ex:
-                    print(f"Error en descarga: {ex}")
-                
-            th.Thread(target = rundownload, daemon = True).start()
+        def rundownload():
+            ydl_opts = {
+                "format"              : "bestaudio[ext=m4a]",
+                "outtmpl"             : f"{ruta}/%(title)s.%(ext)s",
+                "fixup"               : "never",
+                "nopart"              : True,
+                "prefer_ffmpeg"       : False,
+                "external_downloader" : None
+            }
+            if os.path.exists(ruta_completa):
+                    clean()
+                    page.show_dialog(Al.Alerta.alerta(page, True, "Error", "You have this music."))
+                    page.update()
+            else:
+                with yt.YoutubeDL(ydl_opts) as ydl:
+                    ydl.download([url])
+                    clean()
+                    page.show_dialog(Al.Alerta.alerta(page, True, "Complete", "Download complete."))
+                    DownloadText.remo
+                    page.update()
+
+        page.run_thread(rundownload)
 
     def search():
         if (entry.value == ""):
@@ -84,14 +91,15 @@ def main(page : ft.Page):
             DurationText.value           = f"Duration : {duracion // 60}:{duracion % 60}"
             DownloadButton.content       = "Download"
             DownloadButton.on_click      = viewdownload
+            DownloadButton.icon = ft.Icons.DOWNLOAD
             page.update()
 
     Image          = ft.Image(src = "NoImage.png", width = 256, height = 256)
     entry          = ft.TextField(multiline = True)
     DownloadText   = ft.Text("Title : None")
     DurationText   = ft.Text("Duration : --:--")
-    DownloadButton = ft.Button("Search", on_click = search)
-    ButtonChoose   = ft.Button("Choose directory", on_click = choosepath)
+    DownloadButton = ft.Button("Search", icon=ft.Icons.SEARCH_OUTLINED, on_click = search)
+    ButtonChoose   = ft.Button("Choose directory", icon=ft.Icons.FOLDER_OUTLINED, on_click = choosepath)
     PathText       = ft.Text(f"Path : {co.leer("Path")}")
 
     if co.leer("Aceptar") == 0:
