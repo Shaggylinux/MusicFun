@@ -4,21 +4,17 @@ import Config as co
 class Alerta:
     @staticmethod
     def alerta(page: ft.Page, modal: bool, title: str, content: str):
-        
         def cerrar_alerta(e):
-            d.open = False
-            d.update()
-
-        d = ft.AlertDialog(
-            modal=modal,
-            title=ft.Text(title),
-            content=ft.Text(content),
-            actions=[
-                ft.TextButton("Ok", on_click=cerrar_alerta),
-            ],
-            actions_alignment=ft.MainAxisAlignment.END,
+            ft.Page.pop_dialog(page)
+            page.update()
+            
+        return ft.AlertDialog(
+            modal   = modal,
+            title   = ft.Text(title),
+            content = ft.Text(content),
+            actions = ft.TextButton("Ok", on_click = cerrar_alerta),
+            actions_alignment = ft.MainAxisAlignment.END,
         )
-        return d
     
     @staticmethod
     def update(self : ft.Page, modal : bool):
