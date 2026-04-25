@@ -8,7 +8,12 @@ def obtener_ruta_config():
 def leer(clave : str):
     ruta = obtener_ruta_config()
     if not os.path.exists(ruta):
-        base = {"Version": "0.0.4", "Path": "", "Aceptar": 0, "Changelog": ["Alerta de descarga completa"]}
+        base = {"Version": "0.1.0", "Path": "", "Aceptar": 0, "Changelog": [
+                "Bienvenidos a la version estable",
+                "Alertas de descarga agregadas",
+                "Arreglo : con las funciones asincronas",
+                "Nuevo estilo al contenido de los botones"
+            ]}
         with open(ruta, "w") as f:
             json.dump(base, f)
         return base.get(clave)
@@ -26,4 +31,4 @@ def editar(clave : str, valor):
     
     with open(ruta, "w") as f:
         linea[clave] = valor
-        json.dump(linea, f, indent=4, ensure_ascii=False)
+        json.dump(linea, f, indent = 4, ensure_ascii = False)
