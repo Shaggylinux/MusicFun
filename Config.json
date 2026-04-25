@@ -1,11 +1,10 @@
 {
-    "Version": "0.0.3",
+    "Version": "0.1.0",
     "Changelog": [
-        "Ventanas emergentes.",
-        "Cambiar ruta de descarga.",
-        "Notiticaciones de descarga.",
-        "Elegir ruta",
-        "Guardar ruta"
+        "Bienvenidos a la version estable",
+        "Alertas de descarga agregadas",
+        "Arreglo : con las funciones asincronas",
+        "Nuevo estilo al contenido de los botones"
     ],
     "Aceptar": 0,
     "Path": ""
