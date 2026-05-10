@@ -205,13 +205,15 @@ def main(page : ft.Page):
                     "extract_flat" : True,
                     "quiet" : True
                 }
+                lista = ft.Column(expand=True, scroll=ft.ScrollMode.ALWAYS)
+                page.add(lista)
                 
                 with yt.YoutubeDL(yt_opts) as f:
                     info = f.extract_info(url, download=False)
                     for entrada in info["entries"]:
                         titulo = entrada.get("title")
-                        texto = ft.Text(titulo)
-                        page.add(texto)
+                        lista.controls.append(ft.Text(titulo))
+
                     page.update()
 
         Image          = ft.Image(src = "NoImage.png", width = 256, height = 256)
@@ -225,13 +227,13 @@ def main(page : ft.Page):
         if co.leer("Aceptar") == 0:
             page.show_dialog(Al.Alerta.update(page, True))
         
+
         return ft.Column(
             controls=[
                 entry,
                 DownloadButton,
             ],
-            scroll=ft.ScrollMode.ADAPTIVE,
-            expand=True
+            scroll=ft.ScrollMode.ALWAYS,
         )
         
     navbar = ft.NavigationBar(
