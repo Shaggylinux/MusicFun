@@ -212,8 +212,16 @@ def main(page : ft.Page):
                     info = f.extract_info(url, download=False)
                     for entrada in info["entries"]:
                         titulo = entrada.get("title")
-                        lista.controls.append(ft.Text(titulo))
-
+                        miniatura = entrada.get("thumbnail", "No found")
+                        u = entrada.get("url")
+                        lista.controls.extend([
+                                ft.Image(src = miniatura, width = 200, height = 200),
+                                ft.Text(f"Title : {titulo}"),
+                                ft.Text(f"url : {u}"),
+                                ft.Button("Download"),
+                                ft.Divider()
+                                ]
+                            )
                     page.update()
 
         Image          = ft.Image(src = "NoImage.png", width = 256, height = 256)
